@@ -29,7 +29,7 @@ $(document).ready(function () {
     return `
         <div class="col-lg-3 col-md-6">
             <div class="single-product">
-                <img class="img-fluid" src="${product.image}" alt="${product.name}" onerror="console.error('Image failed to load:', this.src)">
+                <img class="img-fluid" src="${product.image}" alt="${product.name}" style="height:200px;object-fit:cover;" onerror="console.error('Image failed to load:', this.src)">
                 <div class="product-details">
                     <h6>${product.name}</h6>
                 </div>
