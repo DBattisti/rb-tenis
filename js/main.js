@@ -25,11 +25,10 @@ $(document).ready(function () {
 
   // Automatically load images from a folder by generating filenames
   function createProductElement(product) {
-    console.log('Creating product element for:', product);
     return `
         <div class="col-lg-3 col-md-6">
             <div class="single-product">
-                <img class="img-fluid" src="${product.image}" alt="${product.name}" style="height:200px;object-fit:cover;" onerror="console.error('Image failed to load:', this.src)">
+                <img class="img-fluid product-modal-img" src="${product.image}" alt="${product.name}" style="height:200px;object-fit:cover;cursor:pointer;" data-full="${product.image}">
                 <div class="product-details">
                     <h6>${product.name}</h6>
                 </div>
@@ -45,19 +44,37 @@ $(document).ready(function () {
       // Load products from JSON file via AJAX
       $.getJSON('img/product/catalog/products.json', function (data) {
         if (data && Array.isArray(data.products)) {
-          console.log('Products loaded from JSON:', data.products);
           data.products.forEach(function (product) {
             $row.append(createProductElement(product));
           });
-        } else {
-          console.warn('No products found in JSON file');
         }
-      }).fail(function (jqxhr, textStatus, error) {
-        console.error('Failed to load products.json:', textStatus, error);
       });
-    } else {
-      console.warn('Target row #dynamic-products-row not found in DOM');
     }
+
+    // Modal HTML (append once)
+    if ($('#product-image-modal').length === 0) {
+      $('body').append(`
+        <div id="product-image-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;">
+          <span id="product-image-modal-close" style="position:absolute;top:30px;right:40px;font-size:40px;color:#fff;cursor:pointer;z-index:10001;">&times;</span>
+          <img id="product-image-modal-img" src="" alt="Product" style="max-width:90vw;max-height:90vh;box-shadow:0 0 20px #000;z-index:10000;display:block;margin:auto;">
+        </div>
+      `);
+    }
+
+    // Image click handler
+    $(document).on('click', '.product-modal-img', function () {
+      var src = $(this).data('full');
+      $('#product-image-modal-img').attr('src', src);
+      $('#product-image-modal').fadeIn(200);
+    });
+
+    // Close modal on background or close button click
+    $('#product-image-modal-close, #product-image-modal').on('click', function (e) {
+      if (e.target.id === 'product-image-modal' || e.target.id === 'product-image-modal-close') {
+        $('#product-image-modal').fadeOut(200);
+        $('#product-image-modal-img').attr('src', '');
+      }
+    });
   });
 
   $('.img-pop-up').magnificPopup({
