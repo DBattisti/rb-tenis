@@ -52,25 +52,34 @@ $(document).ready(function () {
     }
 
     // Modal HTML (append once)
-    if ($('#product-image-modal').length === 0) {
-      $('body').append(`
-        <div id="product-image-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;">
-          <span id="product-image-modal-close" style="position:absolute;top:30px;right:40px;font-size:40px;color:#fff;cursor:pointer;z-index:10001;">&times;</span>
-          <img id="product-image-modal-img" src="" alt="Product" style="max-width:90vw;max-height:90vh;box-shadow:0 0 20px #000;z-index:10000;display:block;margin:auto;">
-        </div>
-      `);
-    }
-
     // Image click handler
-    $(document).on('click', '.product-modal-img', function () {
+    $(document).on('click', '.product-modal-img', function (e) {
+      e.stopPropagation(); // Prevent bubbling
+      // Create modal only if it doesn't exist
+      if ($('#product-image-modal').length === 0) {
+        $('body').append(`
+          <div id="product-image-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;">
+            <span id="product-image-modal-close" style="position:absolute;top:30px;right:40px;font-size:40px;color:#fff;cursor:pointer;z-index:10001;">&times;</span>
+            <img id="product-image-modal-img" src="" alt="Product" style="max-width:90vw;max-height:90vh;box-shadow:0 0 20px #000;z-index:10000;display:block;margin:auto;">
+          </div>
+        `);
+      }
       var src = $(this).data('full');
       $('#product-image-modal-img').attr('src', src);
       $('#product-image-modal').fadeIn(200);
     });
 
     // Close modal on background or close button click
-    $('#product-image-modal-close, #product-image-modal').on('click', function (e) {
-      if (e.target.id === 'product-image-modal' || e.target.id === 'product-image-modal-close') {
+    // Only close modal when clicking the close button or the background (not on page revisit)
+    $(document).on('click', '#product-image-modal-close', function () {
+      console.log('click #product-image-modal-close');
+      $('#product-image-modal').fadeOut(200);
+      $('#product-image-modal-img').attr('src', '');
+    });
+    $(document).on('click', '#product-image-modal', function (e) {
+      console.log('click #product-image-modal');
+      // Only close if clicking the background, not the image
+      if (e.target.id === 'product-image-modal') {
         $('#product-image-modal').fadeOut(200);
         $('#product-image-modal-img').attr('src', '');
       }
